@@ -1,0 +1,9 @@
+*.obj
+*.o
+*.elf
+*.hex
+*.map
+*.inc
+*.asm
+*.lkr
+*.lst
