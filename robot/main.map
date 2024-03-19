@@ -22,7 +22,7 @@ LOAD serial.o
 LOAD /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a
                 0x00000000                        . = ORIGIN (flash)
 
-.text           0x00000000      0xe90
+.text           0x00000000      0xf1c
  *(.vectors)
  .vectors       0x00000000       0xc0 init.o
                 0x00000000                Vectors
@@ -31,63 +31,63 @@ LOAD /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//l
                 0x000000c0                clock_init
                 0x00000114                init
                 0x0000018c                Default_Handler
- .text          0x00000194      0x7a0 main.o
+ .text          0x00000194      0x82c main.o
                 0x00000194                InitTimer
                 0x0000028c                Reload_SCTIMER
                 0x000002d8                STC_IRQ_Handler
-                0x0000034c                wait_1ms
-                0x0000038c                waitms
-                0x000003ae                GetPeriod
-                0x000004a4                ConfigPins
-                0x00000548                ADC_Calibration
-                0x00000580                InitADC
-                0x000005f0                ReadADC
-                0x00000668                main
- .text          0x00000934      0x384 serial.o
-                0x00000934                initUART
-                0x00000a24                UART0_isr
-                0x00000a5c                putBuf
-                0x00000aa4                getBuf
-                0x00000af4                rx_count
-                0x00000b08                eputc
-                0x00000b4c                eputs
-                0x00000b78                egetc
-                0x00000b90                egets
-                0x00000c08                printString
-                0x00000c2c                PrintNumber
- .text          0x00000cb8      0x1d4 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_divsi3.o)
-                0x00000cb8                __aeabi_idiv
-                0x00000cb8                __divsi3
-                0x00000e84                __aeabi_idivmod
- .text          0x00000e8c        0x4 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_dvmd_tls.o)
-                0x00000e8c                __aeabi_ldiv0
-                0x00000e8c                __aeabi_idiv0
+                0x000003d8                wait_1ms
+                0x00000418                waitms
+                0x0000043a                GetPeriod
+                0x00000530                ConfigPins
+                0x000005d4                ADC_Calibration
+                0x0000060c                InitADC
+                0x0000067c                ReadADC
+                0x000006f4                main
+ .text          0x000009c0      0x384 serial.o
+                0x000009c0                initUART
+                0x00000ab0                UART0_isr
+                0x00000ae8                putBuf
+                0x00000b30                getBuf
+                0x00000b80                rx_count
+                0x00000b94                eputc
+                0x00000bd8                eputs
+                0x00000c04                egetc
+                0x00000c1c                egets
+                0x00000c94                printString
+                0x00000cb8                PrintNumber
+ .text          0x00000d44      0x1d4 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_divsi3.o)
+                0x00000d44                __aeabi_idiv
+                0x00000d44                __divsi3
+                0x00000f10                __aeabi_idivmod
+ .text          0x00000f18        0x4 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_dvmd_tls.o)
+                0x00000f18                __aeabi_ldiv0
+                0x00000f18                __aeabi_idiv0
 
-.glue_7         0x00000e90        0x0
- .glue_7        0x00000e90        0x0 linker stubs
+.glue_7         0x00000f1c        0x0
+ .glue_7        0x00000f1c        0x0 linker stubs
 
-.glue_7t        0x00000e90        0x0
- .glue_7t       0x00000e90        0x0 linker stubs
+.glue_7t        0x00000f1c        0x0
+ .glue_7t       0x00000f1c        0x0 linker stubs
 
-.vfp11_veneer   0x00000e90        0x0
- .vfp11_veneer  0x00000e90        0x0 linker stubs
+.vfp11_veneer   0x00000f1c        0x0
+ .vfp11_veneer  0x00000f1c        0x0 linker stubs
 
-.v4_bx          0x00000e90        0x0
- .v4_bx         0x00000e90        0x0 linker stubs
+.v4_bx          0x00000f1c        0x0
+ .v4_bx         0x00000f1c        0x0 linker stubs
 
-.iplt           0x00000e90        0x0
- .iplt          0x00000e90        0x0 init.o
+.iplt           0x00000f1c        0x0
+ .iplt          0x00000f1c        0x0 init.o
 
-.rel.dyn        0x00000e90        0x0
- .rel.iplt      0x00000e90        0x0 init.o
+.rel.dyn        0x00000f1c        0x0
+ .rel.iplt      0x00000f1c        0x0 init.o
 
-.rodata         0x00000e90      0x24f
- .rodata        0x00000e90      0x24c main.o
- .rodata        0x000010dc        0x3 serial.o
+.rodata         0x00000f1c      0x24f
+ .rodata        0x00000f1c      0x24c main.o
+ .rodata        0x00001168        0x3 serial.o
                 0x10000000                        . = ORIGIN (ram)
 
-.data           0x10000000       0x19 load address 0x000010df
-                0x000010df                        INIT_DATA_VALUES = LOADADDR (.data)
+.data           0x10000000       0x19 load address 0x0000116b
+                0x0000116b                        INIT_DATA_VALUES = LOADADDR (.data)
                 0x10000000                        INIT_DATA_START = .
  *(.data)
  .data          0x10000000        0x0 init.o
@@ -101,10 +101,10 @@ LOAD /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//l
                 0x10000019                        INIT_DATA_END = .
                 0x10000019                        BSS_START = .
 
-.igot.plt       0x1000001c        0x0 load address 0x000010f8
+.igot.plt       0x1000001c        0x0 load address 0x00001184
  .igot.plt      0x1000001c        0x0 init.o
 
-.bss            0x1000001c       0x20 load address 0x000010f8
+.bss            0x1000001c       0x20 load address 0x00001184
  *(.bss)
  .bss           0x1000001c        0x0 init.o
  .bss           0x1000001c        0x4 main.o
@@ -116,15 +116,15 @@ LOAD /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//l
 OUTPUT(main.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000      0x658
+.debug_info     0x00000000      0x6bf
  .debug_info    0x00000000      0x10f init.o
- .debug_info    0x0000010f      0x25c main.o
- .debug_info    0x0000036b      0x2ed serial.o
+ .debug_info    0x0000010f      0x2c3 main.o
+ .debug_info    0x000003d2      0x2ed serial.o
 
-.debug_abbrev   0x00000000      0x3e1
+.debug_abbrev   0x00000000      0x43b
  .debug_abbrev  0x00000000       0xea init.o
- .debug_abbrev  0x000000ea      0x157 main.o
- .debug_abbrev  0x00000241      0x1a0 serial.o
+ .debug_abbrev  0x000000ea      0x1b1 main.o
+ .debug_abbrev  0x0000029b      0x1a0 serial.o
 
 .debug_aranges  0x00000000       0x60
  .debug_aranges
@@ -134,16 +134,16 @@ LOAD linker stubs
  .debug_aranges
                 0x00000040       0x20 serial.o
 
-.debug_line     0x00000000      0x682
+.debug_line     0x00000000      0x6c5
  .debug_line    0x00000000       0xab init.o
- .debug_line    0x000000ab      0x3ee main.o
- .debug_line    0x00000499      0x1e9 serial.o
+ .debug_line    0x000000ab      0x431 main.o
+ .debug_line    0x000004dc      0x1e9 serial.o
 
-.debug_str      0x00000000      0x2e6
- .debug_str     0x00000000      0x2e6 init.o
+.debug_str      0x00000000      0x33a
+ .debug_str     0x00000000      0x33a init.o
                                 0x16b (size before relaxing)
- .debug_str     0x000002e6      0x1ee main.o
- .debug_str     0x000002e6      0x1b3 serial.o
+ .debug_str     0x0000033a      0x242 main.o
+ .debug_str     0x0000033a      0x1b3 serial.o
 
 .comment        0x00000000       0x44
  .comment       0x00000000       0x44 init.o
@@ -164,11 +164,11 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000a2       0x1e /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_dvmd_tls.o)
 
-.debug_frame    0x00000000      0x350
+.debug_frame    0x00000000      0x354
  .debug_frame   0x00000000       0x68 init.o
- .debug_frame   0x00000068      0x15c main.o
- .debug_frame   0x000001c4      0x16c serial.o
- .debug_frame   0x00000330       0x20 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_divsi3.o)
+ .debug_frame   0x00000068      0x160 main.o
+ .debug_frame   0x000001c8      0x16c serial.o
+ .debug_frame   0x00000334       0x20 /home/henryrovner/Repos/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi//lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp//libgcc.a(_divsi3.o)
 
 .debug_line_str
                 0x00000000       0xc2

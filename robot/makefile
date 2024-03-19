@@ -29,5 +29,5 @@ clean:
 	rm -f $(OBJS) main.elf main.hex main.map
 
 LoadFlash:
-	../lpc21isp/lpc21isp main.hex $(PORTN) 115200 12000000
+	../../lpc21isp/lpc21isp main.hex $(PORTN) 115200 12000000
 

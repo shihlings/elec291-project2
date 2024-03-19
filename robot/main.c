@@ -26,6 +26,15 @@
 #define F_CPU 60000000L
 #define SYSTEM_CLK 30000000L
 #define DEFAULT_F 100000L // For a 10us servo resolution
+#define MOTOR_CONTROL_LEFT GPIO_B1
+#define MOTOR_DIRECTION_LEFT GPIO_B15
+#define MOTOR_CONTROL_RIGHT GPIO_B9
+#define MOTOR_DIRECTION_RIGHT GPIO_B10
+
+enum Direction {
+  FORWARD = 0,
+  BACKWARD = 1
+};
 
 volatile int ISR_pwm1=150, ISR_pwm2=150, ISR_cnt=0;
 
@@ -79,19 +88,38 @@ void STC_IRQ_Handler(void)
 {
 	SCTIMER_EVFLAG = 0x01; // Clear interrupt flag
 	ISR_cnt++;
-	if(ISR_cnt==ISR_pwm1)
-	{
-		GPIO_B1=0;
+
+	int ISR_pwm1_abs = ISR_pwm1;
+	enum Direction direction_left = FORWARD;
+	int ISR_pwm2_abs = ISR_pwm2;
+	enum Direction direction_right = FORWARD;
+	
+	if (ISR_pwm1_abs < 0) {
+	  ISR_pwm1_abs *= -1;
+	  direction_left = BACKWARD;
 	}
-	if(ISR_cnt==ISR_pwm2)
+	if (ISR_pwm2_abs < 0) {
+	  ISR_pwm2_abs *= -1;
+	  direction_right = BACKWARD;
+	}
+	MOTOR_CONTROL_LEFT = !direction_left;
+	MOTOR_DIRECTION_LEFT = direction_left;
+	MOTOR_CONTROL_RIGHT = !direction_right;
+	MOTOR_DIRECTION_RIGHT = direction_right;
+	
+	if(ISR_cnt==ISR_pwm1_abs)
 	{
-		GPIO_B9=0;
+		MOTOR_CONTROL_LEFT=direction_left;
+	}
+	if(ISR_cnt==ISR_pwm2_abs)
+	{
+		MOTOR_CONTROL_RIGHT=direction_right;
 	}
 	if(ISR_cnt>=2000)
 	{
 		ISR_cnt=0; // 2000 * 10us=20ms
-		GPIO_B1=1;
-		GPIO_B9=1;
+		MOTOR_CONTROL_LEFT=!direction_left;
+		MOTOR_CONTROL_RIGHT=!direction_right;
 	}
 }
 
@@ -299,10 +327,10 @@ void main(void)
 		GPIO_B3=0;
 		GPIO_B2=0;
 		GPIO_B11=0;
-		GPIO_B10=1;
-		GPIO_B15=1;
-		GPIO_B1=0;
-		GPIO_B9=0;
+		MOTOR_DIRECTION_RIGHT=1;
+		MOTOR_DIRECTION_LEFT=1;
+		MOTOR_CONTROL_LEFT=0;
+		MOTOR_CONTROL_RIGHT=0;
 		// Now turn on one of outputs per cycle to check
 		switch (LED_toggle++)
 		{
@@ -316,10 +344,10 @@ void main(void)
 				GPIO_B11=1;
 				break;
 			case 3:
-			  //GPIO_B10=1;
+			  //MOTOR_DIRECTION_RIGHT=1;
 				break;
 			case 4:
-			  //	GPIO_B15=1;
+			  //	MOTOR_DIRECTION_LEFT=1;
 				break;
 			default:
 				break;
