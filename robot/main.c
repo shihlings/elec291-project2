@@ -102,9 +102,9 @@ void STC_IRQ_Handler(void)
 	  ISR_pwm2_abs *= -1;
 	  direction_right = BACKWARD;
 	}
-	MOTOR_CONTROL_LEFT = !direction_left;
+	//MOTOR_CONTROL_LEFT = !direction_left;
 	MOTOR_DIRECTION_LEFT = direction_left;
-	MOTOR_CONTROL_RIGHT = !direction_right;
+	//MOTOR_CONTROL_RIGHT = !direction_right;
 	MOTOR_DIRECTION_RIGHT = direction_right;
 	
 	if(ISR_cnt==ISR_pwm1_abs)
@@ -357,20 +357,20 @@ void main(void)
 		// Change the servo PWM signals
 		if (ISR_pwm1>100)
 		{
-			ISR_pwm1 = 0;
+			ISR_pwm1=-1800;
 		}
 		else
 		{
-			ISR_pwm1=200;	
+			ISR_pwm1=1800;	
 		}
 
 		if (ISR_pwm2>100)
 		{
-			ISR_pwm2 = 0;
+			ISR_pwm2 =-1800;
 		}
 		else
 		{
-			ISR_pwm2=200;	
+			ISR_pwm2=1800;	
 		}
 		
 		waitms(200);	
