@@ -4,7 +4,7 @@ AS=$(ROOT)/bin/arm-none-eabi-as
 LD=$(ROOT)/bin/arm-none-eabi-ld
 CCFLAGS=-mcpu=cortex-m0 -mthumb -g -lgcc
 PORTN=/dev/ttyUSB0
-OBJS=init.o main.o serial.o
+OBJS=init.o main.o serial.o serial1.o
 
 # Search for the path of libraries.
 LIBPATH1=$(shell find $(ROOT)/ -name libgcc.a | grep "v6-m" | sed -e "s/libgcc.a//g")
@@ -24,6 +24,9 @@ init.o: init.c lpc824.h serial.h
 
 serial.o: serial.c lpc824.h serial.h
 	$(CC) -c $(CCFLAGS) serial.c -o serial.o
+
+serial1.o: serial1.c lpc824.h serial1.h
+	$(CC) -c $(CCFLAGS) serial1.c -o serial1.o
 
 clean: 
 	rm -f $(OBJS) main.elf main.hex main.map
