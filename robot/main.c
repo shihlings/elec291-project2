@@ -26,6 +26,7 @@
 #define F_CPU 60000000L
 #define SYSTEM_CLK 30000000L
 #define DEFAULT_F 100000L // For a 10us servo resolution
+#define PI 3.14159
 #define MOTOR_CONTROL_LEFT GPIO_B1
 #define MOTOR_DIRECTION_LEFT GPIO_B15
 #define MOTOR_CONTROL_RIGHT GPIO_B9
@@ -266,6 +267,7 @@ void main(void)
 {
 	int j, v;
 	long int count, f;
+	long int l;
 	unsigned char LED_toggle=0;
 	
 	ConfigPins();	
@@ -315,6 +317,9 @@ void main(void)
 			PrintNumber(f, 10, 7);
 			eputs("Hz, count=");
 			PrintNumber(count, 10, 6);
+			l=1000000000000000/(4*PI*PI*f*f*50);
+			eputs(" l=");
+			PrintNumber(l, 10, 10);
 			eputs("          \r");
 		}
 		else
