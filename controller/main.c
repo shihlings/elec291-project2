@@ -3,8 +3,15 @@
 #include "lcd.h"
 #include "joystick.h"
 #include "jdy40.h"
+#include "global.h"
 
 idata char buff[20];
+
+void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
+{
+	TF2H = 0; // Clear Timer2 interrupt flag
+	OUT0=!OUT0;
+}
 
 int getsn (char * buff, int len)
 {
@@ -42,11 +49,19 @@ void SendATCommand (char * s)
 
 void main (void)
 {
+	unsigned long int f;
 	unsigned int RX = 0;
 	unsigned int RY = 0;
 	char buff[20];
+	char lcdbuff[17];
 	unsigned int cnt = 0;
+
+	TR2=0;	
 	
+	TR2=1; // Start timer 2
+	f=SYSCLK/(2L*(0x10000L-TMR2RL));
+	printf("\nActual frequency: %lu\n", f);
+
 	// Configure the LCD
 	LCD_4BIT();
 	
@@ -77,15 +92,17 @@ void main (void)
 	{
 		RX = readVRX();
 		RY = readVRY();
-		printf("RX: %5d, RY: %5d\r", RX, RY);
+		printf("RX: %05d, RY: %05d\r", RX, RY);
 		
-		if(P3_7==0)
-		{
-			sprintf(buff, "JDY40 test %d\r\n", cnt++);
-			sendstr1(buff);
-			putchar('.');
-			waitms_or_RI1(200);
-		}
+		sprintf(lcdbuff, "%05d", RX);
+		LCDprint(lcdbuff, 1, 1);
+		sprintf(lcdbuff, "%05d", RY);
+		LCDprint(lcdbuff, 2, 1);
+		
+		sprintf(buff, "%05d;%05d\r\n", RX, RY);
+		sendstr1(buff);
+		waitms_or_RI1(100);
+
 		if(RXU1())
 		{
 			getstr1(buff);
