@@ -1,5 +1,6 @@
 #include "lpc824.h"
 #include "serial.h"
+#include "serial1.h"
 
 // LPC824 pinout:
 //                             --------
@@ -124,19 +125,22 @@ void STC_IRQ_Handler(void)
 	}
 }
 
-void wait_1ms(void)
+void Delay_us(unsigned char us)
 {
 	// For SysTick info check the LPC824 manual page 317 in chapter 20.
-	SYST_RVR = (F_CPU/1000L) - 1;  // set reload register, counter rolls over from zero, hence -1
+	SYST_RVR = (SYSTEM_CLK/(1000000L/us)) - 1;  // set reload register, counter rolls over from zero, hence -1
 	SYST_CVR = 0; // load the SysTick counter
 	SYST_CSR = 0x05; // Bit 0: ENABLE, BIT 1: TICKINT, BIT 2:CLKSOURCE
 	while((SYST_CSR & BIT16)==0); // Bit 16 is the COUNTFLAG.  True when counter rolls over from zero.
 	SYST_CSR = 0x00; // Disable Systick counter
 }
 
-void waitms(int len)
+void waitms (unsigned int ms)
 {
-	while(len--) wait_1ms();
+	unsigned int j;
+	unsigned char k;
+	for(j=0; j<ms; j++)
+		for (k=0; k<4; k++) Delay_us(250);
 }
 
 #define PIN_PERIOD (GPIO_B13) // Read period from PIO0_13 (pin 3)
@@ -261,6 +265,22 @@ int ReadADC(int channel)
 	return ( (ADC_SEQA_GDAT >> 4) & 0xfff);
 }
 
+void SendATCommand (char * s)
+{
+	char buff[31];
+	eputs("Command: \r\n");
+	eputs(s);
+	GPIO_B11=0; // 'SET' pin to 0 is 'AT' mode.
+	waitms(20);
+	eputs1(s);
+	egets1(buff, 30);
+	GPIO_B11=1; // 'SET' pin to 1 is normal operation mode.
+	waitms(20);
+	eputs("Response: \r\n:");
+	eputs(buff);
+	eputc('\n');
+}
+
 // In order to keep this as nimble as possible, avoid
 // using floating point or printf on any of its forms!
 void main(void)
@@ -270,13 +290,14 @@ void main(void)
 	long int l;
 	unsigned char LED_toggle=0;
 	
-	ConfigPins();	
+	ConfigPins();
+	initUART1(9600);
 	initUART(115200);
-	InitADC();
+	//InitADC();
 	InitTimer();
 	enable_interrupts();
 	
-	waitms(500); // Give PuTTY time to start	
+	waitms(500); // Give PuTTY time to start
 	eputs("\x1b[2J\x1b[1;1H"); // Clear screen using ANSI escape sequence.
 	eputs("\r\nLPC824 multi I/O example.\r\n");
 	eputs("Measures the voltage at channels 3 and 9 (pins 1 and 2 of TSSOP20 package)\r\n");
@@ -284,10 +305,20 @@ void main(void)
 	eputs("Toggles PIO0_3, PIO0_2, PIO0_11, PIO0_10, PIO0_15, PIO0_1, PIO0_9 (pins 7, 8, 9, 10, 11 of TSSOP20 package)\r\n");
 	eputs("Generates servo PWMs on PIO0_1, PIO0_9 (pins 12, 13 of TSSOP20 package)\r\n");
 	eputs("WARNING: PIO0_11 (pin 9) and PIO0_10 (pin 10) need external pull-up resistors to 3.3V (1k seems to work)\r\n");
+
+	SendATCommand("AT+DVID0F28\r\n");  
+
+	SendATCommand("AT+VER\r\n");
+	SendATCommand("AT+BAUD\r\n");
+	SendATCommand("AT+RFID\r\n");
+	SendATCommand("AT+DVID\r\n");
+	SendATCommand("AT+RFC\r\n");
+	SendATCommand("AT+POWE\r\n");
+	SendATCommand("AT+CLSS\r\n");
 	
 	while(1)	
 	{
-		j=ReadADC(3);
+	  /*j=ReadADC(3);
 		v=(j*33000)/0xfff;
 		eputs("ADC[3]=0x");
 		PrintNumber(j, 16, 4);
@@ -306,7 +337,7 @@ void main(void)
 		eputc('.');
 		PrintNumber(v%10000, 10, 4);
 		eputs("V ");;
-
+	  */
 		GPIO_B14 = 1;	
 		count=GetPeriod(35);
 		GPIO_B14 = 0;	

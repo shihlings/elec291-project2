@@ -17,4 +17,3 @@ void eputc1(const char c);
 void eputs1(const char *s);
 void printString1(const char *s);
 void PrintNumber1(int N, int Base, int digits);
-

@@ -13,6 +13,7 @@ void clock_init();
 void Default_Handler(void);
 void SysTick(void);
 extern void UART0_isr(void);
+extern void UART1_isr(void);
 void main(void);
 void STC_IRQ_Handler(void);
 
@@ -47,7 +48,7 @@ const void * Vectors[] __attribute__((section(".vectors"))) ={
 	Default_Handler,				/* 1 SPI1_IRQ */
 	Default_Handler,				/* 2 RESERVED */
 	UART0_isr,				/* 3 UART0_IRQ */
-	Default_Handler,				/* 4 UART1_IRQ */
+	UART1_isr,				/* 4 UART1_IRQ */
 	Default_Handler,				/* 5 UART2_IRQ */
 	Default_Handler,				/* 6 RESERVED */
 	Default_Handler,				/* 7 I2C1_IRQ */

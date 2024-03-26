@@ -154,4 +154,3 @@ void PrintNumber1(int N, int Base, int digits)
 	}
 	eputs1(&buff[j+1]);
 }
-
