@@ -168,9 +168,7 @@ long int GetPeriod (int n)
 {
   int i;
   unsigned int saved_TCNT1a, saved_TCNT1b;
-	
-  SYST_RVR = 0xffffff;  // 24-bit counter set to check for signal present
-  SYST_CVR = 0xffffff; // load the SysTick counter
+	SYST_RVR = 0xffffff;  // 24-bit counter set to check for signal present SYST_CVR = 0xffffff; // load the SysTick counter
   SYST_CSR = 0x05; // Bit 0: ENABLE, BIT 1: TICKINT, BIT 2:CLKSOURCE
   while (PIN_PERIOD!=0) // Wait for square wave to be 0
     {
@@ -308,6 +306,8 @@ void main(void)
   long int l;
   unsigned char LED_toggle=0;
   char buff[80];
+  int num1s[5], num2s[5], num3s[5];
+  int num1, num2, num3;
 	
   ConfigPins();
   initUART1(9600);
@@ -354,6 +354,25 @@ void main(void)
       eputs(buff);
       eputc('\n');
       
+      for (int i = 0; i<5; i++){
+	num1s[i]=buff[i];
+      }
+      j=0;
+      for (i += 1; i < 11; i++){
+     	num2s[j]=buff[i];
+        j++;	
+      }
+      
+      k=0;
+
+      for (i += 1; i<17; i++){
+      	num3s[k] = buff[i];
+	k++;
+      }
+	num1 = num1s[4]*10000 + num1s[3]*1000 + num1s[2]*100 + num1s[1]*10 + num1s[0];
+	num2 = num2s[4]*10000 + num2s[3]*1000 + num2s[2]*100 + num2s[1]*10 + num2s[0];
+	num3 = num3s[4]*10000 + num3s[3]*1000 + num3s[2]*100 + num3s[1]*10 + num3s[0];
+     if ((num1 + num2) != num3); 
       // Change the servo PWM signals
       if (ISR_pwm1>100)
 	{
