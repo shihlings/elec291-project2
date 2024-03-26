@@ -40,10 +40,34 @@ enum Direction {
 
 volatile int ISR_pwm1=150, ISR_pwm2=150, ISR_cnt=0;
 
-void clear_buffer(char *buff, int size) {
-  for (int i = 0; i < size; i++) {
-    buff[i] = '\0';
+char parse_buffer (char *buff, int *num1, int *num2) {
+  int num1s[5], num2s[5], num3s[5];
+  int num3;
+  for (int i = 0; i<5; i++){
+    num1s[i]=buff[i] - 48;
   }
+  int j=0;
+  for (int i = 6; i < 11; i++){
+    num2s[j]=buff[i] - 48;
+    j++;	
+  }
+      
+  int k=0;
+
+  for (int i = 12; i<17; i++){
+    num3s[k] = buff[i] - 48;
+    k++;
+  }
+  *num1 = num1s[4]*10000 + num1s[3]*1000 + num1s[2]*100 + num1s[1]*10 + num1s[0];
+  *num2 = num2s[4]*10000 + num2s[3]*1000 + num2s[2]*100 + num2s[1]*10 + num2s[0];
+  num3 = num3s[4]*10000 + num3s[3]*1000 + num3s[2]*100 + num3s[1]*10 + num3s[0];
+  if ((*num1 + *num2) != num3) {
+    return 0;
+  }
+  eputc('\n');
+  PrintNumber(*num1, 10, 5);
+  eputc('\n');
+  return 1;
 }
 
 void InitTimer(void)
@@ -306,7 +330,6 @@ void main(void)
   long int l;
   unsigned char LED_toggle=0;
   char buff[80];
-  int num1s[5], num2s[5], num3s[5];
   int num1, num2, num3;
 	
   ConfigPins();
@@ -350,29 +373,12 @@ void main(void)
 	}
 
       wait_and_RX(1000, buff);
+
+      parse_buffer(buff, &num1, &num2);
       
       eputs(buff);
       eputc('\n');
       
-      for (int i = 0; i<5; i++){
-	num1s[i]=buff[i];
-      }
-      j=0;
-      for (i += 1; i < 11; i++){
-     	num2s[j]=buff[i];
-        j++;	
-      }
-      
-      k=0;
-
-      for (i += 1; i<17; i++){
-      	num3s[k] = buff[i];
-	k++;
-      }
-	num1 = num1s[4]*10000 + num1s[3]*1000 + num1s[2]*100 + num1s[1]*10 + num1s[0];
-	num2 = num2s[4]*10000 + num2s[3]*1000 + num2s[2]*100 + num2s[1]*10 + num2s[0];
-	num3 = num3s[4]*10000 + num3s[3]*1000 + num3s[2]*100 + num3s[1]*10 + num3s[0];
-     if ((num1 + num2) != num3); 
       // Change the servo PWM signals
       if (ISR_pwm1>100)
 	{
