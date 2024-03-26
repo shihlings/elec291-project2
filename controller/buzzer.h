@@ -1,0 +1,1 @@
+void setFreq (unsigned long int freq);

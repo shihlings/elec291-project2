@@ -1,4 +1,4 @@
-#define VRX QFP32_MUX_P2_1
+#define VRX QFP32_MUX_P2_5
 #define VRY QFP32_MUX_P2_2
 
 void InitADC (void);

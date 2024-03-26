@@ -7,7 +7,10 @@ char _c51_external_startup (void)
 	SFRPAGE = 0x00;
 	WDTCN = 0xDE; //First key
 	WDTCN = 0xAD; //Second key
-
+	
+	VDM0CN |= 0x80;
+	RSTSRC = 0x02;
+	
 	#if (SYSCLK == 48000000L)	
 		SFRPAGE = 0x10;
 		PFE0CN  = 0x10; // SYSCLK < 50 MHz.
@@ -47,7 +50,9 @@ char _c51_external_startup (void)
 	#endif
 
 	P0MDOUT |= 0x11; // Enable UART0 TX (P0.4) and UART1 TX (P0.0) as push-pull outputs
-	P2MDOUT |= 0x01; // P2.0 in push-pull mode
+	//P2MDOUT |= 0x01; // P2.0 in push-pull mode
+	P2MDOUT|=0b_0000_0011;
+	//P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
 	XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)                     
 	XBR1     = 0X00;
 	XBR2     = 0x41; // Enable crossbar and uart 1
@@ -63,6 +68,15 @@ char _c51_external_startup (void)
 	TMOD |=  0x20;                       
 	TR1 = 1; // START Timer1
 	TI = 1;  // Indicate TX0 ready
-  	
+	
+  	// Initialize timer 2 for periodic interrupts
+	TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
+	CKCON0|=0b_0001_0000;
+	TMR2RL=(-(SYSCLK/(2*DEFAULT_F))); // Initialize reload value
+	TMR2=0xffff;   // Set to reload immediately
+	ET2=1;         // Enable Timer2 interrupts
+	TR2=1;         // Start Timer2
+	EA=1; // Global interrupt enable
+	
 	return 0;
 }

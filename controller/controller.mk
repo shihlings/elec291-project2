@@ -1,14 +1,14 @@
 SHELL=cmd
 CC=c51
 COMPORT = $(shell type COMPORT.inc)
-OBJS=main.obj startup.obj lcd.obj joystick.obj jdy40.obj
+OBJS=main.obj startup.obj lcd.obj joystick.obj jdy40.obj buzzer.obj
 
 main.hex: $(OBJS)
 	$(CC) $(OBJS)
 	@del *.asm *.lst *.lkr 2> nul
 	@echo Done!
 	
-main.obj: main.c lcd.h
+main.obj: main.c lcd.h global.h joystick.h jdy40.h buzzer.h
 	$(CC) -c main.c
 
 startup.obj: startup.c global.h
@@ -22,6 +22,9 @@ joystick.obj: joystick.c joystick.h global.h
 
 jdy40.obj: jdy40.c jdy40.h global.h
 	$(CC) -c jdy40.c
+	
+buzzer.obj: buzzer.c buzzer.h global.h
+	$(CC) -c buzzer.c
 
 clean:
 	@del $(OBJS) *.asm *.lkr *.lst *.map *.hex *.map 2> nul
