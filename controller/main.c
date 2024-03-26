@@ -1,3 +1,7 @@
+/* 
+	COMMENT OUT THE DEBUG FLAG IN "GLOBAL.H" WHEN NOT DEBUGGING/TESTING.
+*/
+
 #include <EFM8LB1.h>
 #include <stdio.h>
 #include "lcd.h"
@@ -48,20 +52,10 @@ void SendATCommand (char * s)
 	printf("Response: %s\r\n", buff);
 }
 
-void main (void)
+#ifdef DEBUG
+void startupDebugDisplay ()
 {
-	unsigned long int f;
-	unsigned int RX = 0;
-	unsigned int RY = 0;
-	char buff[20];
-	char lcdbuff[17];
-	unsigned int cnt = 0;
-
-	// Configure the LCD
-	LCD_4BIT(); 
-	
-#ifdef DEBUG	
-    waitms(500); // Give PuTTy a chance to start before sending
+	waitms(500); // Give PuTTy a chance to start before sending
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
 	printf ("\n\nEFM8 Controller Test Program\n"
@@ -69,17 +63,19 @@ void main (void)
         "Compiled: %s, %s\n\n"
         "----------DEBUG ENABLED----------\n\n",
         __FILE__, __DATE__, __TIME__);
+}
 #endif
 
-   	// Display something in the LCD
-	LCDprint("CONTROLLER TEST", 1, 1);
-	LCDprint("PROGRAM", 2, 1);
+void initALL()
+{
+	// Configure the LCD
+	LCD_4BIT();
 	
 	InitPinADC(2, 5); // Configure P2.5 as analog input
 	InitPinADC(2, 2); // Configure P2.2 as analog input
     InitADC();
-	
-	// We should select an unique device ID.  The device ID can be a hex
+    
+    // We should select an unique device ID.  The device ID can be a hex
 	// number from 0x0000 to 0xFFFF.
 	// WE ARE USING 0x0F28
 	UART1_Init(9600);
@@ -94,9 +90,13 @@ void main (void)
 	SendATCommand("AT+CLSS\r\n");
 	printf("\r\n");
 #endif
+}
 
-	TR2=0;	
-#ifdef DEBUG	
+#ifdef DEBUG
+void testBuzzer ()
+{
+	unsigned long int f;
+	
 	TR2=1; //Start timer 2
 	for (f=200; f<2000;)
 	{
@@ -105,6 +105,28 @@ void main (void)
 		f+=100;
 	}
 	TR2 = 0;
+}
+#endif
+
+void main (void)
+{
+	unsigned int RX = 0;
+	unsigned int RY = 0;
+	char buff[20];
+	char lcdbuff[17];
+
+	// show program info in PuTTY if DEBUG flag is set
+#ifdef DEBUG	
+    startupDebugDisplay();
+#endif
+	
+	// initialize all devices
+	initALL();
+
+	// Turn off Buzzer
+	TR2=0;
+#ifdef DEBUG
+	testBuzzer();
 #endif
 
 	while(1)

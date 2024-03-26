@@ -1,5 +1,5 @@
-#define VRX QFP32_MUX_P2_5
-#define VRY QFP32_MUX_P2_2
+#define VRX QFP32_MUX_P2_2
+#define VRY QFP32_MUX_P2_5
 
 void InitADC (void);
 void InitPinADC (unsigned char portno, unsigned char pin_num);
