@@ -32,6 +32,7 @@
 #define MOTOR_DIRECTION_LEFT GPIO_B15
 #define MOTOR_CONTROL_RIGHT GPIO_B9
 #define MOTOR_DIRECTION_RIGHT GPIO_B10
+#define JOYSTICK_DEADZONE 1000
 
 enum Direction {
   FORWARD = 0,
@@ -58,16 +59,17 @@ char parse_buffer (char *buff, int *num1, int *num2) {
     num3s[k] = buff[i] - 48;
     k++;
   }
-  *num1 = num1s[4]*10000 + num1s[3]*1000 + num1s[2]*100 + num1s[1]*10 + num1s[0];
-  *num2 = num2s[4]*10000 + num2s[3]*1000 + num2s[2]*100 + num2s[1]*10 + num2s[0];
-  num3 = num3s[4]*10000 + num3s[3]*1000 + num3s[2]*100 + num3s[1]*10 + num3s[0];
+  *num1 = num1s[0]*10000 + num1s[1]*1000 + num1s[2]*100 + num1s[3]*10 + num1s[4];
+  *num2 = num2s[0]*10000 + num2s[1]*1000 + num2s[2]*100 + num2s[3]*10 + num2s[4];
+  num3 = num3s[0]*10000 + num3s[1]*1000 + num3s[2]*100 + num3s[3]*10 + num3s[4];
   if ((*num1 + *num2) != num3) {
-    return 0;
+    return 1; // Transmission error
   }
+  printString("aaa");
   eputc('\n');
   PrintNumber(*num1, 10, 5);
   eputc('\n');
-  return 1;
+  return 0;
 }
 
 void InitTimer(void)
@@ -321,6 +323,30 @@ void SendATCommand (char * s)
   eputc('\n');
 }
 
+void joystick_to_pwm (int js_X, int js_Y) {
+  ISR_pwm1 = 1;
+  ISR_pwm2 = 1;
+  if (js_X > 8192 + JOYSTICK_DEADZONE || js_X < 8192 - JOYSTICK_DEADZONE) {
+    ISR_pwm1 += (8192-js_X)*1500/8192;
+    ISR_pwm2 += (js_X-8192)*1500/8192;
+  }
+  if (js_Y > 8192 + JOYSTICK_DEADZONE || js_Y < 8192 - JOYSTICK_DEADZONE) {
+    ISR_pwm1 += (8192-js_Y)*2000/8192;
+    ISR_pwm2 += (8192-js_Y)*2000/8192;
+  }
+  if (ISR_pwm1 > 2000) {
+    ISR_pwm1 = 2000;
+  } else if (ISR_pwm1 < -2000) {
+    ISR_pwm1 = -2000;
+  }
+
+  if (ISR_pwm2 > 2000) {
+    ISR_pwm2 = 2000;
+  } else if (ISR_pwm2 < -2000) {
+    ISR_pwm2 = -2000;
+  }
+}
+
 // In order to keep this as nimble as possible, avoid
 // using floating point or printf on any of its forms!
 void main(void)
@@ -330,7 +356,7 @@ void main(void)
   long int l;
   unsigned char LED_toggle=0;
   char buff[80];
-  int num1, num2, num3;
+  int joystick_X, joystick_Y;
 	
   ConfigPins();
   initUART1(9600);
@@ -372,30 +398,13 @@ void main(void)
 	  eputs("NO SIGNAL                     \r");
 	}
 
-      wait_and_RX(1000, buff);
+      wait_and_RX(10, buff);
 
-      parse_buffer(buff, &num1, &num2);
+      if (!parse_buffer(buff, &joystick_X, &joystick_Y)) { // Check for error
+	joystick_to_pwm(joystick_X, joystick_Y);
+      } // If there is an error, hold PWM values
       
       eputs(buff);
       eputc('\n');
-      
-      // Change the servo PWM signals
-      if (ISR_pwm1>100)
-	{
-	  ISR_pwm1=-1800;
-	}
-      else
-	{
-	  ISR_pwm1=1800;	
-	}
-
-      if (ISR_pwm2>100)
-	{
-	  ISR_pwm2 =-1800;
-	}
-      else
-	{
-	  ISR_pwm2=1800;	
-	}
     }
 }
