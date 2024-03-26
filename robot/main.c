@@ -40,6 +40,12 @@ enum Direction {
 
 volatile int ISR_pwm1=150, ISR_pwm2=150, ISR_cnt=0;
 
+void clear_buffer(char *buff, int size) {
+  for (int i = 0; i < size; i++) {
+    buff[i] = '\0';
+  }
+}
+
 void InitTimer(void)
 {
   SCTIMER_CTRL |= BIT2; // halt SCTimer
@@ -141,6 +147,18 @@ void waitms (unsigned int ms)
   unsigned char k;
   for(j=0; j<ms; j++)
     for (k=0; k<4; k++) Delay_us(250);
+}
+
+void wait_and_RX (unsigned int ms, char* buff)
+{
+  unsigned int j;
+  unsigned char k;
+  for(j=0; j<ms; j++) {
+    if (rx_count1()>0) {
+      egets1(buff, 80);
+    }
+    for (k=0; k<4; k++) Delay_us(250);
+  }
 }
 
 #define PIN_PERIOD (GPIO_B13) // Read period from PIO0_13 (pin 3)
@@ -289,6 +307,7 @@ void main(void)
   long int count, f;
   long int l;
   unsigned char LED_toggle=0;
+  char buff[80];
 	
   ConfigPins();
   initUART1(9600);
@@ -316,22 +335,25 @@ void main(void)
       if(count>0)
 	{
 	  f=(F_CPU*35L)/count;
-	  eputs("f=");
-	  PrintNumber(f, 10, 7);
-	  eputs("Hz, count=");
-	  PrintNumber(count, 10, 6);
+	  //eputs("f=");
+	  //PrintNumber(f, 10, 7);
+	  //eputs("Hz, count=");
+	  //PrintNumber(count, 10, 6);
 	  l=1000000000000000/(4*PI*PI*f*f*50);
-	  eputs(" l=");
-	  PrintNumber(l, 10, 10);
-	  eputs("          \r");
+	  //eputs(" l=");
+	  //PrintNumber(l, 10, 10);
+	  //eputs("          \r\n");
 	}
       else
 	{
 	  eputs("NO SIGNAL                     \r");
 	}
-		
-      if(LED_toggle>4) LED_toggle=0;
 
+      wait_and_RX(1000, buff);
+      
+      eputs(buff);
+      eputc('\n');
+      
       // Change the servo PWM signals
       if (ISR_pwm1>100)
 	{
@@ -350,7 +372,5 @@ void main(void)
 	{
 	  ISR_pwm2=1800;	
 	}
-		
-      waitms(1000);	
     }
 }
