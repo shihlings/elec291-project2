@@ -159,7 +159,7 @@ void main (void)
 		sendstr1(buff);
 		
 		// wait and receive
-		wait_and_RI1(150, buff);
+		wait_and_RI1(50, buff);
 #ifdef DEBUG
 		printf("\n\rRX: %s\r\n\n", buff);
 #endif
