@@ -1,5 +1,6 @@
 /* 
 	COMMENT OUT THE DEBUG FLAG IN "GLOBAL.H" WHEN NOT DEBUGGING/TESTING.
+	COMMENT OUT THE SHUTUP FLAG TO ENABLE ALL BUZZER SOUNDS.
 */
 
 #include <EFM8LB1.h>
@@ -112,9 +113,17 @@ void main (void)
 {
 	unsigned int RX = 0;
 	unsigned int RY = 0;
+	unsigned int new_ind = 0;
+	unsigned int ind = 0;
+	unsigned int temp = 0;
+	unsigned int baseline = 0;
+	unsigned int checksum = 0;
 	char buff[20];
 	char lcdbuff[17];
-
+	
+	// Turn off Buzzer
+	TR2=0;
+	
 	// show program info in PuTTY if DEBUG flag is set
 #ifdef DEBUG	
     startupDebugDisplay();
@@ -123,35 +132,45 @@ void main (void)
 	// initialize all devices
 	initALL();
 
-	// Turn off Buzzer
-	TR2=0;
+
 #ifdef DEBUG
+#ifndef SHUTUP
 	testBuzzer();
+#endif
 #endif
 
 	while(1)
 	{
+		// read joystick data
 		RX = readVRX();
 		RY = readVRY();
 #ifdef DEBUG
-		printf("RX: %05d, RY: %05d\r", RX, RY);
+		printf("RX: %05d, RY: %05d, ind: %04d\r", RX, RY, ind);
 #endif
-
+		
+		// put data on LCD
 		sprintf(lcdbuff, "%05d", RX);
 		LCDprint(lcdbuff, 1, 1);
 		sprintf(lcdbuff, "%05d", RY);
 		LCDprint(lcdbuff, 2, 1);
 		
+		// send joystick data
 		sprintf(buff, "%05d;%05d!%05d.\r\n", RX, RY, RX+RY);
 		sendstr1(buff);
-		waitms_or_RI1(100);
-
-		if(RXU1())
-		{
-			getstr1(buff);
+		
+		// wait and receive
+		wait_and_RI1(150, buff);
 #ifdef DEBUG
-			printf("RX: %s\r\n", buff);
+		printf("\n\rRX: %s\r\n\n", buff);
 #endif
+		// parse received data
+		sscanf(buff, "%04d,%04d", &new_ind, &checksum);
+		
+		// validate data
+		temp = (new_ind / 1000) + (new_ind % 1000) / 100 + (new_ind % 100) / 10 + (new_ind % 10);
+		if (checksum == (temp % 10))
+		{
+			ind = new_ind;
 		}
 	}
 }

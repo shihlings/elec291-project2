@@ -6,4 +6,5 @@
 
 #define OUT0 P2_1
 
-//#define DEBUG
+#define DEBUG
+#define SHUTUP

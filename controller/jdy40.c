@@ -115,3 +115,25 @@ void waitms_or_RI1 (unsigned int ms)
 		}
 	}
 }
+
+void wait_and_RI1 (unsigned int ms, char* buff)
+{
+	unsigned int j;
+	unsigned char k;
+	for(j=0; j<20; j++)
+	{
+		buff[j] = ' ';
+	}
+	
+	for(j=0; j<ms; j++)
+	{
+		for (k=0; k<4; k++)
+		{
+			if(RXU1())
+			{
+				getstr1(buff);
+			}
+			Timer3us(250);
+		}
+	}
+}

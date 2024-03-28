@@ -6,3 +6,4 @@ char getchar1_with_timeout (void);
 void getstr1 (char * s);
 bit RXU1 (void);
 void waitms_or_RI1 (unsigned int ms);
+void wait_and_RI1 (unsigned int ms, char* buff);
