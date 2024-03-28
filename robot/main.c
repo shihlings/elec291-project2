@@ -65,11 +65,15 @@ char parse_buffer (char *buff, int *num1, int *num2) {
   if ((*num1 + *num2) != num3) {
     return 1; // Transmission error
   }
-  printString("aaa");
-  eputc('\n');
-  PrintNumber(*num1, 10, 5);
-  eputc('\n');
   return 0;
+}
+
+int pow(int base, int exponent) {
+  if (exponent > 0) {
+    return base*pow(base, exponent-1);
+  } else {
+    return 1;
+  }
 }
 
 void InitTimer(void)
@@ -253,62 +257,6 @@ void ConfigPins(void)
   GPIO_DIR0 |= BIT9;    // Configure PIO0_9  as output (pin 13).
 }
 
-/* Start ADC calibration */
-void ADC_Calibration(void)
-{
-  unsigned int saved_ADC_CTRL;
-
-  // Follow the instructions from the user manual (21.3.4 Hardware self-calibration)
-	
-  //To calibrate the ADC follow these steps:
-	
-  //1. Save the current contents of the ADC CTRL register if different from default.	
-  saved_ADC_CTRL=ADC_CTRL;
-  // 2. In a single write to the ADC CTRL register, do the following to start the
-  //    calibration:
-  //    – Set the calibration mode bit CALMODE.
-  //    – Write a divider value to the CLKDIV bit field that divides the system
-  //      clock to yield an ADC clock of about 500 kHz.
-  //    – Clear the LPWR bit.
-  ADC_CTRL = BIT30 | ((300/5)-1); // BIT30=CALMODE, BIT10=LPWRMODE, BIT7:0=CLKDIV
-  // 3. Poll the CALMODE bit until it is cleared.
-  while(ADC_CTRL&BIT30);
-  // Before launching a new A/D conversion, restore the contents of the CTRL
-  // register or use the default values.
-  ADC_CTRL=saved_ADC_CTRL;
-}
-
-
-void InitADC(void)
-{
-  // Will use pins 1 and 2 of TSSOP-20 package (PIO_23 and PIO_17) for ADC.
-  // These correspond to ADC Channel 3 and 9.  Also connect the
-  // VREFN pin (pin 17 of TSSOP-20) to GND, and VREFP the
-  // pin (pin 17 of TSSOP-20) to VDD (3.3V).
-	
-  SYSCON_PDRUNCFG &= ~BIT4; // Power up the ADC
-  SYSCON_SYSAHBCLKCTRL |= BIT24;// Start the ADC Clocks
-  ADC_Calibration();
-  ADC_SEQA_CTRL &= ~BIT31; // Ensure SEQA_ENA is disabled before making changes	
-	
-  ADC_CTRL =1;// Set the ADC Clock divisor
-  SWM_PINENABLE0 &= ~BIT16; // Enable the ADC function on PIO_23 (ADC_3, pin 1 of TSSOP20)	
-  SWM_PINENABLE0 &= ~BIT22; // Enable the ADC function on PIO_17 (ADC_9, pin 9 of TSSOP20)	
-}
-
-// WARNING: in order to use the ADC with other pins, the pins need to be configured in
-// the function above.
-int ReadADC(int channel)
-{
-  ADC_SEQA_CTRL &= ~BIT31; // Ensure SEQA_ENA is disabled before making changes
-  ADC_SEQA_CTRL &= 0xfffff000; // Deselect all previously selected channels	
-  ADC_SEQA_CTRL |= (1<<channel); // Select Channel	
-  ADC_SEQA_CTRL |= BIT31 + BIT18; // Set SEQA and Trigger polarity bits
-  ADC_SEQA_CTRL |= BIT26; // Start a conversion:
-  while( (ADC_SEQA_GDAT & BIT31)==0); // Wait for data valid
-  return ( (ADC_SEQA_GDAT >> 4) & 0xfff);
-}
-
 void SendATCommand (char * s)
 {
   char buff[31];
@@ -369,7 +317,7 @@ void main(void)
 	
   waitms(500); // Give PuTTY time to start
   eputs("\x1b[2J\x1b[1;1H"); // Clear screen using ANSI escape sequence.
-  SendATCommand("AT+DVID2F3A\r\n");
+  SendATCommand("AT+DVID0F28\r\n");
   
   SendATCommand("AT+VER\r\n");
   SendATCommand("AT+BAUD\r\n");
@@ -380,17 +328,10 @@ void main(void)
   SendATCommand("AT+CLSS\r\n");
   
   while(1){
-  
-      //GPIO_B14 = 1;	
       count=GetPeriod(35);
-      //GPIO_B14 = 0;	
       if(count>0)
 	{
 	  f=(F_CPU*35L)/count;
-	  //eputs("f=");
-	  //PrintNumber(f, 10, 7);
-	  //eputs("Hz, count=");
-	  //PrintNumber(count, 10, 6);
 	  l=1000000000000000/(4*PI*PI*f*f*50);
 	  //eputs(" l=");
 	  //PrintNumber(l, 10, 10);
@@ -401,22 +342,29 @@ void main(void)
 	  //eputs("NO SIGNAL                     \r");
 	}
 	
-	
-	for(j=3; j>=0; j--){
-	  induc[j]=l%10;
-	  l/=10;
-	}
-  
-   eputs1(induc);
-   eputs1("\r\n");
 
-      wait_and_RX(10, buff);
+      // Int to string
+      induc[0] = l/1000 + 48;
+      induc[1] = (l % 1000) / 100 + 48;
+      induc[2] = (l % 100) / 10 + 48;
+      induc[3] = (l % 10) + 48;
+      
+      induc[4] = ',';
+
+      // Checksum - sum of four digits, modulo 10
+      induc[5] = (l/1000 + (l % 1000) / 100 + (l % 100) / 10 + l % 10) % 10 + 48;
+      induc[6] = 0;
+      
+      eputs1(induc);
+      eputs1("\r\n");
+      
+
+      wait_and_RX(100, buff);
 
       if (!parse_buffer(buff, &joystick_X, &joystick_Y)) { // Check for error
 	joystick_to_pwm(joystick_X, joystick_Y);
       } // If there is an error, hold PWM values
       
-      eputs(buff);
-      eputc('\n');
+      
     }
 }
