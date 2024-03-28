@@ -359,7 +359,7 @@ void main(void)
       eputs1("\r\n");
       
 
-      wait_and_RX(100, buff);
+      wait_and_RX(50, buff);
 
       if (!parse_buffer(buff, &joystick_X, &joystick_Y)) { // Check for error
 	joystick_to_pwm(joystick_X, joystick_Y);
