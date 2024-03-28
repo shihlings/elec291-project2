@@ -11,7 +11,7 @@ LIBPATH1=$(subst \libgcc.a,,$(shell dir /s /b "$(GCCPATH)*libgcc.a" | find "v6-m
 LIBPATH2=$(subst \libc_nano.a,,$(shell dir /s /b "$(GCCPATH)*libc_nano.a" | find "v6-m"))
 LIBSPEC=-L"$(LIBPATH1)" -L"$(LIBPATH2)"
 
-OBJS=init.o	main.o serial.o
+OBJS=init.o	main.o serial.o serial1.o
 
 main.elf : $(OBJS)
 	$(LD) $(OBJS) $(LIBSPEC) -nostdlib -lnosys -lgcc -T lpc824_linker_script.ld --cref -Map main.map -o main.elf
@@ -24,8 +24,11 @@ main.o: main.c
 init.o: init.c
 	$(CC) -c $(CCFLAGS) init.c -o init.o
 
-serial.o: serial.c
+serial.o: serial.c serial.h
 	$(CC) -c $(CCFLAGS) serial.c -o serial.o
+
+serial1.o: serial1.c serial1.h
+	$(CC) -c $(CCFLAGS) serial1.c -o serial1.o
 
 clean: 
 	@del $(OBJS) 2>NUL
