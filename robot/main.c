@@ -230,6 +230,8 @@ long int GetPeriod (int n)
   return 0xffffff-SYST_CVR;
 }
 
+
+
 void ConfigPins(void)
 {
   GPIO_DIR0 &= ~(BIT13);  // Configure PIO0_13 as input (pin 2).
@@ -351,11 +353,12 @@ void joystick_to_pwm (int js_X, int js_Y) {
 // using floating point or printf on any of its forms!
 void main(void)
 {
-  int j, v;
+  int j, v, cnt;
   long int count, f;
   long int l;
   unsigned char LED_toggle=0;
   char buff[80];
+  char induc[80];
   int joystick_X, joystick_Y;
 	
   ConfigPins();
@@ -366,8 +369,8 @@ void main(void)
 	
   waitms(500); // Give PuTTY time to start
   eputs("\x1b[2J\x1b[1;1H"); // Clear screen using ANSI escape sequence.
-  SendATCommand("AT+DVID0F28\r\n");  
-
+  SendATCommand("AT+DVID2F3A\r\n");
+  
   SendATCommand("AT+VER\r\n");
   SendATCommand("AT+BAUD\r\n");
   SendATCommand("AT+RFID\r\n");
@@ -375,9 +378,9 @@ void main(void)
   SendATCommand("AT+RFC\r\n");
   SendATCommand("AT+POWE\r\n");
   SendATCommand("AT+CLSS\r\n");
-	
-  while(1)	
-    {
+  
+  while(1){
+  
       //GPIO_B14 = 1;	
       count=GetPeriod(35);
       //GPIO_B14 = 0;	
@@ -395,8 +398,17 @@ void main(void)
 	}
       else
 	{
-	  eputs("NO SIGNAL                     \r");
+	  //eputs("NO SIGNAL                     \r");
 	}
+	
+	
+	for(j=3; j>=0; j--){
+	  induc[j]=l%10;
+	  l/=10;
+	}
+  
+   eputs1(induc);
+   eputs1("\r\n");
 
       wait_and_RX(10, buff);
 
