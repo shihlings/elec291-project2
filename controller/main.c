@@ -109,14 +109,15 @@ void testBuzzer ()
 }
 #endif
 
+unsigned int ind = 1;
+unsigned int baseline = 1;
+
 void main (void)
 {
 	unsigned int RX = 0;
 	unsigned int RY = 0;
-	unsigned int new_ind = 0;
-	unsigned int ind = 0;
 	unsigned int temp = 0;
-	unsigned int baseline = 0;
+	unsigned int new_ind = 1;
 	unsigned int checksum = 0;
 	char buff[20];
 	char lcdbuff[17];
@@ -144,9 +145,6 @@ void main (void)
 		// read joystick data
 		RX = readVRX();
 		RY = readVRY();
-#ifdef DEBUG
-		printf("RX: %05d, RY: %05d, ind: %04d\r", RX, RY, ind);
-#endif
 		
 		// put data on LCD
 		sprintf(lcdbuff, "%05d", RX);
@@ -172,5 +170,46 @@ void main (void)
 		{
 			ind = new_ind;
 		}
+		
+		if (RESET_IND == 0)
+		{
+			if (ind != 0)
+			{
+				baseline = ind;
+			}
+		}
+		
+		if (baseline > ind && ind != 0)
+		{
+			temp = (baseline - ind) * 20;
+			if (temp > 200)
+			{
+				setFreq(temp);
+				TR2 = 1;
+			}
+			else
+			{
+				setFreq(1);
+				TR2 = 0;
+			}
+		}
+		else if (baseline < ind && ind != 0)
+		{
+			temp = (ind - baseline) * 20;
+			if (temp > 200)
+			{
+				setFreq(temp);
+				TR2 = 1;
+			}
+			else
+			{
+				setFreq(1);
+				TR2 = 0;
+			}
+		}
+		
+#ifdef DEBUG
+		printf("RX: %05d, RY: %05d, ind: %04d, baseline: %04d\r", RX, RY, ind, baseline);
+#endif
 	}
 }

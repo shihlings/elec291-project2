@@ -5,6 +5,7 @@
 #define DEFAULT_F 1000L
 
 #define OUT0 P2_1
+#define RESET_IND P2_4
 
 #define DEBUG
-#define SHUTUP
+//#define SHUTUP
