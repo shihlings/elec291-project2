@@ -1,6 +1,6 @@
 /* 
 	COMMENT OUT THE DEBUG FLAG IN "GLOBAL.H" WHEN NOT DEBUGGING/TESTING.
-	COMMENT OUT THE SHUTUP FLAG TO ENABLE ALL BUZZER SOUNDS.
+	COMMENT OUT THE SHUTUP FLAG IN "GLOBAL.H" TO ENABLE ALL BUZZER SOUNDS.
 */
 
 #include <EFM8LB1.h>
@@ -12,7 +12,10 @@
 #include "buzzer.h"
 
 idata char buff[20];
+unsigned int ind = 1;
+unsigned int baseline = 0;
 
+// toggle buzzer pin upon triggering interrupt
 void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 {
 	TF2H = 0; // Clear Timer2 interrupt flag
@@ -72,6 +75,7 @@ void initALL()
 	// Configure the LCD
 	LCD_4BIT();
 	
+	// Configure joystick analog inputs
 	InitPinADC(2, 5); // Configure P2.5 as analog input
 	InitPinADC(2, 2); // Configure P2.2 as analog input
     InitADC();
@@ -94,6 +98,8 @@ void initALL()
 }
 
 #ifdef DEBUG
+#ifndef SHUTUP
+// tests buzzer by playing tones from low to high freq
 void testBuzzer ()
 {
 	unsigned long int f;
@@ -108,9 +114,7 @@ void testBuzzer ()
 	TR2 = 0;
 }
 #endif
-
-unsigned int ind = 1;
-unsigned int baseline = 1;
+#endif 
 
 void main (void)
 {
@@ -142,23 +146,32 @@ void main (void)
 	while(1)
 	{
 		// read joystick data
-		RX = readVRX();
-		RY = readVRY();
+		RX = ADC_at_Pin(VRX);
+		RY = ADC_at_Pin(VRY);
 		
 		// put data on LCD
 		prepLCDl1(lcdbuff, RX, RY);
 		LCDprint(lcdbuff, 1, 1);
+#ifdef DEBUG
+		printf("\r\n%s ", lcdbuff);
+#endif
 		prepLCDl2(lcdbuff, ind, baseline);
 		LCDprint(lcdbuff, 2, 1);
+#ifdef DEBUG
+		printf("%s\n\r", lcdbuff);
+#endif
 		
 		// send joystick data
 		prepstr(buff, RX, RY);
 		sendstr1(buff);
+#ifdef DEBUG
+		printf("TX: %s\r\n", buff);
+#endif
 		
 		// wait and receive
 		wait_and_RI1(50, buff);
 #ifdef DEBUG
-		printf("\n\rRX: %s\r\n\n", buff);
+		printf("RX: %s\r\n", buff);
 #endif
 		// parse received data
 		parseind(buff, &new_ind, &checksum);
@@ -176,6 +189,11 @@ void main (void)
 			{
 				baseline = ind;
 			}
+		}
+		
+		if (baseline == 0)
+		{
+			baseline = ind;
 		}
 		
 #ifndef SHUTUP
@@ -208,9 +226,6 @@ void main (void)
 			}
 		}
 #endif
-		
-#ifdef DEBUG
-		printf("RX: %05d, RY: %05d, ind: %04d, baseline: %04d\r", RX, RY, ind, baseline);
-#endif
+		ind++;
 	}
 }

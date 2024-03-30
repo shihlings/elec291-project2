@@ -4,5 +4,3 @@
 void InitADC (void);
 void InitPinADC (unsigned char portno, unsigned char pin_num);
 unsigned int ADC_at_Pin(unsigned char pin);
-unsigned int readVRX(void);
-unsigned int readVRY(void);

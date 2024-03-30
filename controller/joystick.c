@@ -78,13 +78,3 @@ unsigned int ADC_at_Pin(unsigned char pin)
 	while (!ADINT); // Wait for conversion to complete
 	return (ADC0);
 }
-
-unsigned int readVRX(void)
-{
-	return ADC_at_Pin(VRX);
-}
-
-unsigned int readVRY(void)
-{
-	return ADC_at_Pin(VRY);
-}

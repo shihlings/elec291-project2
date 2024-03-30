@@ -8,4 +8,4 @@
 #define RESET_IND P2_4
 
 #define DEBUG
-//#define SHUTUP
+#define SHUTUP

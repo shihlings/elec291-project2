@@ -1,11 +1,11 @@
 void UART1_Init (unsigned long baudrate);
 void putchar1 (char c);
 void sendstr1 (char * s);
-char getchar1 (void);
 char getchar1_with_timeout (void);
 void getstr1 (char * s);
 bit RXU1 (void);
-void waitms_or_RI1 (unsigned int ms);
 void wait_and_RI1 (unsigned int ms, char* buff);
 void prepstr(char* buff, unsigned int RX, unsigned int RY);
 void parseind(char* buff, unsigned int* ind, unsigned int* baseline);
+void numToChar5(char* buff, unsigned int num);
+void numToChar4(char* buff, unsigned int num);

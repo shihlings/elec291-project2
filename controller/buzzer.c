@@ -2,6 +2,7 @@
 #include "global.h"
 #include "buzzer.h"
 
+// sets buzzer frequency and turns it on
 void setFreq (unsigned long int freq)
 {
 	TR2 = 0;
