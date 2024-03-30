@@ -96,3 +96,65 @@ void LCDprint(char * string, unsigned char line, bit clear)
 	for(j=0; string[j]!=0; j++)	WriteData(string[j]);// Write the message
 	if(clear) for(; j<CHARS_PER_LINE; j++) WriteData(' '); // Clear the rest of the line
 }
+
+void prepLCDl1(char* lcdbuff, unsigned int RX, unsigned int RY)
+{
+	lcdbuff[0] = 'X';
+	lcdbuff[1] = ':';
+	lcdbuff[2] = (RX / 10000) + '0';
+	RX -= (lcdbuff[2] - '0') * 10000;
+	lcdbuff[3] = (RX / 1000) + '0';
+	RX -= (lcdbuff[3] - '0')*1000;
+	lcdbuff[4] = (RX / 100) + '0';
+	RX -= (lcdbuff[4]- '0')*100;
+	lcdbuff[5] = (RX / 10) + '0';
+	RX -= (lcdbuff[5]- '0')*10;
+	lcdbuff[6] = RX + '0';
+	
+	lcdbuff[7] = ' ';
+	lcdbuff[8] = ' ';
+	lcdbuff[9] = ' ';
+	
+	lcdbuff[10] = 'Y';
+	lcdbuff[11] = ':';
+	lcdbuff[12] = (RY / 10000) + '0';
+	RY -= (lcdbuff[12] - '0') * 10000;
+	lcdbuff[13] = (RY / 1000) + '0';
+	RY -= (lcdbuff[13] - '0')*1000;
+	lcdbuff[14] = (RY / 100) + '0';
+	RY -= (lcdbuff[14]- '0')*100;
+	lcdbuff[15] = (RY / 10) + '0';
+	RY -= (lcdbuff[15]- '0')*10;
+	lcdbuff[16] = RY + '0';
+	lcdbuff[17] = '\0';
+}
+
+void prepLCDl2(char* lcdbuff, unsigned int ind, unsigned int baseline)
+{
+	lcdbuff[0] = 'L';
+	lcdbuff[1] = ':';
+	lcdbuff[2] = (ind / 1000) + '0';
+	ind -= (lcdbuff[2] - '0') * 1000;
+	lcdbuff[3] = (ind / 100) + '0';
+	ind -= (lcdbuff[3] - '0')*100;
+	lcdbuff[4] = (ind / 10) + '0';
+	ind -= (lcdbuff[4]- '0')*10;
+	lcdbuff[5] = ind + '0';
+	
+	lcdbuff[6] = ' ';
+	lcdbuff[7] = ' ';
+	
+	lcdbuff[8] = 'B';
+	lcdbuff[9] = 'a';
+	lcdbuff[10] = 's';
+	lcdbuff[11] = 'e';
+	lcdbuff[12] = ':';
+	lcdbuff[13] = (baseline / 1000) + '0';
+	baseline -= (lcdbuff[13] - '0')*1000;
+	lcdbuff[14] = (baseline / 100) + '0';
+	baseline -= (lcdbuff[14]- '0')*100;
+	lcdbuff[15] = (baseline / 10) + '0';
+	baseline -= (lcdbuff[15]- '0')*10;
+	lcdbuff[16] = baseline + '0';
+	lcdbuff[17] = '\0';
+}

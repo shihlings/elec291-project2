@@ -137,3 +137,60 @@ void wait_and_RI1 (unsigned int ms, char* buff)
 		}
 	}
 }
+
+void prepstr(char* buff, unsigned int RX, unsigned int RY)
+{
+	unsigned int temp = RX+RY;
+	buff[0] = (RX / 10000) + '0';
+	RX -= (buff[0] - '0') * 10000;
+	buff[1] = (RX / 1000) + '0';
+	RX -= (buff[2] - '0')*1000;
+	buff[2] = (RX / 100) + '0';
+	RX -= (buff[3]- '0')*100;
+	buff[3] = (RX / 10) + '0';
+	RX -= (buff[4]- '0')*10;
+	buff[4] = RX + '0';
+	
+	buff[5] = ';';
+	
+	buff[6] = (RY / 10000) + '0';
+	RX -= (buff[6] - '0')* 10000;
+	buff[7] = (RY / 1000) + '0';
+	RX -= (buff[7] - '0')*1000;
+	buff[8] =(RY / 100) + '0';
+	RX -= (buff[8]- '0')*100;
+	buff[9] = (RY / 10) + '0';
+	RX -= (buff[9]- '0')*10;
+	buff[10] = RY + '0';
+	
+	buff[11] = '!';
+	
+	buff[12] = (temp / 10000) + '0';
+	temp -= (buff[12] - '0')* 10000;
+	buff[13] = (temp / 1000) + '0';
+	temp -= (buff[13] - '0')*1000;
+	buff[14] = (temp / 100) + '0';
+	temp -= (buff[14]- '0')*100;
+	buff[15] = (temp / 10) + '0';
+	temp -= (buff[15]- '0')*10;
+	buff[16] = temp + '0';
+
+	buff[17] = '.';
+	buff[18] = '\0';
+}
+
+void parseind(char* buff, unsigned int* new_ind, unsigned int* checksum)
+{
+	if (buff[4] == ',')
+	{
+		*new_ind = buff[0] * 1000;
+		*new_ind += buff[1] * 100;
+		*new_ind += buff[2] * 10;
+		*new_ind += buff[3];
+		
+		*checksum = buff[5] * 1000;
+		*checksum += buff[6] * 100;
+		*checksum += buff[7] * 10;
+		*checksum += buff[8];
+	}
+}

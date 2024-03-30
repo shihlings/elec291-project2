@@ -133,7 +133,6 @@ void main (void)
 	// initialize all devices
 	initALL();
 
-
 #ifdef DEBUG
 #ifndef SHUTUP
 	testBuzzer();
@@ -147,13 +146,13 @@ void main (void)
 		RY = readVRY();
 		
 		// put data on LCD
-		sprintf(lcdbuff, "%05d", RX);
+		prepLCDl1(lcdbuff, RX, RY);
 		LCDprint(lcdbuff, 1, 1);
-		sprintf(lcdbuff, "%05d", RY);
+		prepLCDl2(lcdbuff, ind, baseline);
 		LCDprint(lcdbuff, 2, 1);
 		
 		// send joystick data
-		sprintf(buff, "%05d;%05d!%05d.\r\n", RX, RY, RX+RY);
+		prepstr(buff, RX, RY);
 		sendstr1(buff);
 		
 		// wait and receive
@@ -162,7 +161,7 @@ void main (void)
 		printf("\n\rRX: %s\r\n\n", buff);
 #endif
 		// parse received data
-		sscanf(buff, "%04d,%04d", &new_ind, &checksum);
+		parseind(buff, &new_ind, &checksum);
 		
 		// validate data
 		temp = (new_ind / 1000) + (new_ind % 1000) / 100 + (new_ind % 100) / 10 + (new_ind % 10);
@@ -179,6 +178,7 @@ void main (void)
 			}
 		}
 		
+#ifndef SHUTUP
 		if (baseline > ind && ind != 0)
 		{
 			temp = (baseline - ind) * 20;
@@ -207,6 +207,7 @@ void main (void)
 				TR2 = 0;
 			}
 		}
+#endif
 		
 #ifdef DEBUG
 		printf("RX: %05d, RY: %05d, ind: %04d, baseline: %04d\r", RX, RY, ind, baseline);

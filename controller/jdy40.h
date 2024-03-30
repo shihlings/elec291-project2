@@ -7,3 +7,5 @@ void getstr1 (char * s);
 bit RXU1 (void);
 void waitms_or_RI1 (unsigned int ms);
 void wait_and_RI1 (unsigned int ms, char* buff);
+void prepstr(char* buff, unsigned int RX, unsigned int RY);
+void parseind(char* buff, unsigned int* ind, unsigned int* baseline);
