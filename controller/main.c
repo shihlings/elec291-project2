@@ -116,6 +116,22 @@ void testBuzzer ()
 #endif
 #endif 
 
+
+// if frequency > 200, play, otherwize, mute
+void compAndChangeFreq(unsigned int freq)
+{
+	if (freq > 200)
+	{
+		setFreq(freq);
+		TR2 = 1;
+	}
+	else
+	{
+		setFreq(1);
+		TR2 = 0;
+	}
+}
+
 void main (void)
 {
 	unsigned int RX = 0;
@@ -153,26 +169,34 @@ void main (void)
 		prepLCDl1(lcdbuff, RX, RY);
 		LCDprint(lcdbuff, 1, 1);
 #ifdef DEBUG
-		printf("\r\n%s ", lcdbuff);
+		printf("\r\n");
+		printf(lcdbuff);
+		printf(" ");
 #endif
 		prepLCDl2(lcdbuff, ind, baseline);
 		LCDprint(lcdbuff, 2, 1);
 #ifdef DEBUG
-		printf("%s\n\r", lcdbuff);
+		printf(lcdbuff);
+		printf("\r\n");
 #endif
 		
 		// send joystick data
 		prepstr(buff, RX, RY);
 		sendstr1(buff);
 #ifdef DEBUG
-		printf("TX: %s\r\n", buff);
+		printf("TX: ");
+		printf(buff);
+		printf("\r\n");
 #endif
 		
 		// wait and receive
 		wait_and_RI1(50, buff);
 #ifdef DEBUG
-		printf("RX: %s\r\n", buff);
+		printf("RX: ");
+		printf(buff);
+		printf("\r\n\n");
 #endif
+
 		// parse received data
 		parseind(buff, &new_ind, &checksum);
 		
@@ -183,6 +207,7 @@ void main (void)
 			ind = new_ind;
 		}
 		
+		// if button pressed, update baseline inductance
 		if (RESET_IND == 0)
 		{
 			if (ind != 0)
@@ -191,39 +216,29 @@ void main (void)
 			}
 		}
 		
+		// if controller just started up, immediately set baseline as current inductance.
+		// baseline and ind are initialized with 0, it will continue resetting until 
+		// valid values start appearing
 		if (baseline == 0)
 		{
 			baseline = ind;
 		}
 		
 #ifndef SHUTUP
+		// compare inductance and play sound on buzzer
+		// 		  |baseline - ind| 
+		// freq = ---------------- * 2048
+		//		         100
+		// buzzer is loudest at 2000 
 		if (baseline > ind && ind != 0)
 		{
-			temp = (baseline - ind) * 20;
-			if (temp > 200)
-			{
-				setFreq(temp);
-				TR2 = 1;
-			}
-			else
-			{
-				setFreq(1);
-				TR2 = 0;
-			}
+			temp = (baseline - ind) * 2048 / 100;
+			compAndChangeFreq(temp);
 		}
 		else if (baseline < ind && ind != 0)
 		{
-			temp = (ind - baseline) * 20;
-			if (temp > 200)
-			{
-				setFreq(temp);
-				TR2 = 1;
-			}
-			else
-			{
-				setFreq(1);
-				TR2 = 0;
-			}
+			temp = (ind - baseline) * 2048 / 100;
+			compAndChangeFreq(temp);
 		}
 #endif
 	}
