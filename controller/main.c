@@ -12,7 +12,7 @@
 #include "buzzer.h"
 
 idata char buff[20];
-unsigned int ind = 1;
+unsigned int ind = 0;
 unsigned int baseline = 0;
 
 // toggle buzzer pin upon triggering interrupt
@@ -226,6 +226,5 @@ void main (void)
 			}
 		}
 #endif
-		ind++;
 	}
 }
