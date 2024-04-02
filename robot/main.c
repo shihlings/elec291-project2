@@ -68,9 +68,9 @@ char parse_buffer (char *buff, int *num1, int *num2) {
   return 0;
 }
 
-int pow(int base, int exponent) {
+int pow_custom(int base, int exponent) {
   if (exponent > 0) {
-    return base*pow(base, exponent-1);
+    return base*pow_custom(base, exponent-1);
   } else {
     return 1;
   }
@@ -184,10 +184,14 @@ void wait_and_RX (unsigned int ms, char* buff)
   unsigned int j;
   unsigned char k;
   for(j=0; j<ms; j++) {
-    if (rx_count1()>0) {
-      egets1(buff, 80);
+    for (k=0; k<8; k++)
+    {
+	  if (rx_count1()>0)
+	  {
+	    egets1(buff, 80);
+      }
+      Delay_us(125);
     }
-    for (k=0; k<4; k++) Delay_us(250);
   }
 }
 
