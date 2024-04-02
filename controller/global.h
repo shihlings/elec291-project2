@@ -4,8 +4,11 @@
 
 #define DEFAULT_F 1000L
 
+#define NUM_LCD_MODE 2
+
 #define OUT0 P2_1
 #define RESET_IND P2_4
+#define SWITCH_LCD P2_6
 
 #define DEBUG
-#define SHUTUP
+//#define SHUTUP

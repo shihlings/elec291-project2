@@ -98,7 +98,7 @@ void LCDprint(char * string, unsigned char line, bit clear)
 	if(clear) for(; j<CHARS_PER_LINE; j++) WriteData(' '); // Clear the rest of the line
 }
 
-void prepLCDl1(char* lcdbuff, unsigned int RX, unsigned int RY)
+void prepLCDl10(char* lcdbuff, unsigned int RX, unsigned int RY)
 {
 	lcdbuff[0] = 'X';
 	lcdbuff[1] = ':';
@@ -111,6 +111,43 @@ void prepLCDl1(char* lcdbuff, unsigned int RX, unsigned int RY)
 	lcdbuff[10] = ':';
 	numToChar5(lcdbuff+11, RY);
 	lcdbuff[16] = '\0';
+}
+
+void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
+{
+	if (ind > baseline)
+	{
+		lcdbuff[0] = 'F';
+		lcdbuff[1] = 'E';
+		lcdbuff[2] = 'R';
+		lcdbuff[3] = 'R';
+		lcdbuff[4] = 'O';
+		lcdbuff[5] = 'M';
+		lcdbuff[6] = 'A';
+		lcdbuff[7] = 'G';
+		lcdbuff[8] = 'N';
+		lcdbuff[9] = 'E';
+		lcdbuff[10] = 'T';
+		lcdbuff[11] = 'I';
+		lcdbuff[12] = 'C';
+		lcdbuff[13] = '\0';
+	}
+	else
+	{
+		lcdbuff[0] = 'P';
+		lcdbuff[1] = 'A';
+		lcdbuff[2] = 'R';
+		lcdbuff[3] = 'A';
+		lcdbuff[4] = 'M';
+		lcdbuff[5] = 'A';
+		lcdbuff[6] = 'G';
+		lcdbuff[7] = 'N';
+		lcdbuff[8] = 'E';
+		lcdbuff[9] = 'T';
+		lcdbuff[10] = 'I';
+		lcdbuff[11] = 'C';
+		lcdbuff[12] = '\0';
+	}
 }
 
 void prepLCDl2(char* lcdbuff, unsigned int ind, unsigned int baseline)

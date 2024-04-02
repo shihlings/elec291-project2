@@ -94,7 +94,8 @@ void wait_and_RI1 (unsigned int ms, char* buff)
 {
 	unsigned int j;
 	unsigned char k;
-	for(j=0; j<20; j++)
+	bit received = 0;
+	for(j=0; j<19; j++)
 	{
 		buff[j] = ' ';
 	}
@@ -102,13 +103,21 @@ void wait_and_RI1 (unsigned int ms, char* buff)
 	
 	for(j=0; j<ms; j++)
 	{
-		for (k=0; k<4; k++)
+		for (k=0; k<8; k++)
 		{
 			if(RXU1())
 			{
+				if (received)
+				{
+					for(j=0; j<20; j++)
+					{
+						buff[j] = ' ';
+					}
+					buff[19] = '\0';
+				}
 				getstr1(buff);
 			}
-			Timer3us(250);
+			Timer3us(125);
 		}
 	}
 }
@@ -121,19 +130,16 @@ void wait_and_RI1 (unsigned int ms, char* buff)
 void prepstr(char* buff, unsigned int RX, unsigned int RY)
 {	
 	numToChar5(buff+0, RX);
-	buff[5] = ';';
-	
-	numToChar5(buff+6, RY);
-	buff[11] = '!';
-	
-	numToChar5(buff+12, RX+RY);
-	buff[17] = '.';
-	buff[18] = '\0';
+	numToChar5(buff+2, RY);
+	numToChar5(buff+4, RX+RY);
+	buff[6] = '\r';
+	buff[7] = '\n';
+	buff[8] = '\0';
 }
 
 // parsing formatted string from RF receiver
 // expected input "XXXX,Y"
-// XXXX is 4 digit uint
+// XXXX is 4 digit uintA
 // Y is 1 digit checksum = (X+X+X+X)%10
 void parseind(char* buff, unsigned int* new_ind, unsigned int* checksum)
 {
@@ -156,11 +162,11 @@ void numToChar5(char* buff, unsigned int num)
 	num -= (buff[0] - '0')* 10000;
 	buff[1] = (num / 1000) + '0';
 	num -= (buff[1] - '0')*1000;
-	buff[2] = (num / 100) + '0';
-	num -= (buff[2]- '0')*100;
-	buff[3] = (num / 10) + '0';
-	num -= (buff[3]- '0')*10;
-	buff[4] = num + '0';
+	//buff[2] = (num / 100) + '0';
+	//num -= (buff[2]- '0')*100;
+	//buff[3] = (num / 10) + '0';
+	//num -= (buff[3]- '0')*10;
+	//buff[4] = num + '0';
 }
 
 void numToChar4(char* buff, unsigned int num)

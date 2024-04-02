@@ -11,9 +11,12 @@
 #include "global.h"
 #include "buzzer.h"
 
-idata char buff[20];
+idata char buff[25];
 unsigned int ind = 0;
+unsigned int old_ind = 0;
 unsigned int baseline = 0;
+unsigned int display_mode = 0;
+bit SWITCH_LCD_pressed = 0;
 
 // toggle buzzer pin upon triggering interrupt
 void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
@@ -134,12 +137,12 @@ void compAndChangeFreq(unsigned int freq)
 
 void main (void)
 {
+	char buff[10];
 	unsigned int RX = 0;
 	unsigned int RY = 0;
 	unsigned int temp = 0;
 	unsigned int new_ind = 1;
 	unsigned int checksum = 0;
-	char buff[20];
 	char lcdbuff[17];
 	
 	// Turn off Buzzer
@@ -155,7 +158,7 @@ void main (void)
 
 #ifdef DEBUG
 #ifndef SHUTUP
-	testBuzzer();
+	//testBuzzer();
 #endif
 #endif
 
@@ -166,7 +169,14 @@ void main (void)
 		RY = ADC_at_Pin(VRY);
 		
 		// put data on LCD
-		prepLCDl1(lcdbuff, RX, RY);
+		if (display_mode == 0)
+		{
+			prepLCDl10(lcdbuff, RX, RY);
+		}
+		else if (display_mode == 1)
+		{
+			prepLCDl11(lcdbuff, ind, baseline);
+		}
 		LCDprint(lcdbuff, 1, 1);
 #ifdef DEBUG
 		printf("\r\n");
@@ -216,6 +226,17 @@ void main (void)
 			}
 		}
 		
+		if (SWITCH_LCD == 0)
+		{
+			SWITCH_LCD_pressed = 1;
+		}
+		
+		if (SWITCH_LCD_pressed == 1 && SWITCH_LCD != 0)
+		{
+			SWITCH_LCD_pressed = 0;
+			display_mode = (display_mode + 1) % NUM_LCD_MODE;
+		}
+		
 		// if controller just started up, immediately set baseline as current inductance.
 		// baseline and ind are initialized with 0, it will continue resetting until 
 		// valid values start appearing
@@ -229,17 +250,18 @@ void main (void)
 		// 		  |baseline - ind| 
 		// freq = ---------------- * 2048
 		//		         100
-		// buzzer is loudest at 2000 
+		// buzzer is loudest at 2048 
 		if (baseline > ind && ind != 0)
 		{
-			temp = (baseline - ind) * 2048 / 100;
+			temp = (baseline - (ind + old_ind) / 2) * 2048 / 100;
 			compAndChangeFreq(temp);
 		}
 		else if (baseline < ind && ind != 0)
 		{
-			temp = (ind - baseline) * 2048 / 100;
+			temp = ((ind + old_ind) / 2 - baseline) * 2048 / 100;
 			compAndChangeFreq(temp);
 		}
+		old_ind = ind;
 #endif
 	}
 }
