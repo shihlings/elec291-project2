@@ -117,6 +117,8 @@ void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
 {
 	if (ind > baseline)
 	{
+		7seg1 = 1;
+		7seg2 = 0;
 		lcdbuff[0] = 'F';
 		lcdbuff[1] = 'E';
 		lcdbuff[2] = 'R';
@@ -134,6 +136,8 @@ void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
 	}
 	else
 	{
+		7seg1 = 0;
+		7seg2 = 1;
 		lcdbuff[0] = 'P';
 		lcdbuff[1] = 'A';
 		lcdbuff[2] = 'R';
