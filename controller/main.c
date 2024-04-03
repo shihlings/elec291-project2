@@ -11,6 +11,7 @@
 #include "global.h"
 #include "buzzer.h"
 
+#define VDD 3.3035 // The measured value of VDD in volts
 idata char buff[25];
 unsigned int ind = 0;
 unsigned int old_ind = 0;
@@ -23,6 +24,12 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 {
 	TF2H = 0; // Clear Timer2 interrupt flag
 	OUT0=!OUT0;
+}
+
+
+float Volts_at_Pin(unsigned char pin)
+{
+	 return ((ADC_at_Pin(pin)*VDD)/0b_0011_1111_1111_1111);
 }
 
 int getsn (char * buff, int len)
@@ -81,6 +88,7 @@ void initALL()
 	// Configure joystick analog inputs
 	InitPinADC(2, 5); // Configure P2.5 as analog input
 	InitPinADC(2, 2); // Configure P2.2 as analog input
+	InitPinADC(3,0);
     InitADC();
     
     // We should select an unique device ID.  The device ID can be a hex
@@ -140,10 +148,11 @@ void main (void)
 	char buff[10];
 	unsigned int RX = 0;
 	unsigned int RY = 0;
-	unsigned int batADC;
+	unsigned int batvot;
 	unsigned int temp = 0;
 	unsigned int new_ind = 1;
 	unsigned int checksum = 0;
+	float percent;
 	char lcdbuff[17];
 	
 	// Turn off Buzzer
@@ -166,7 +175,6 @@ void main (void)
 	while(1)
 	{
 		//read battery voltage
-		batADC = ADC_at_Pin(BP);
 		// read joystick data
 		RX = ADC_at_Pin(VRX);
 		RY = ADC_at_Pin(VRY);
@@ -265,6 +273,11 @@ void main (void)
 			compAndChangeFreq(temp);
 		}
 		old_ind = ind;
+
+		//Measuring voltage
+		batvot = Volts_at_Pin(BP);
+		percent = (int) batvot/3.0*100.0;
+
 #endif
 	}
 }

@@ -115,6 +115,14 @@ void prepLCDl10(char* lcdbuff, unsigned int RX, unsigned int RY)
 
 void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
 {
+	lcdbuff[0] = 'B';
+	lcdbuff[1] = 'A';
+	lcdbuff[2] = 'T';
+	lcdbuff[3] = '%';
+	lcdbuff[4] = ' ';
+	lcdbuff[5] = '=';
+	lcdbuff[6] = ' ';
+	numToChar4(lcdbuff+7, percent); 
 	seg1 = 0;
 	seg2 = 0;
 	if (ind > baseline)
