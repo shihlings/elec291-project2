@@ -6,8 +6,8 @@
 #define LCD_D6 P1_2
 #define LCD_D7 P1_1
 #define CHARS_PER_LINE 16
-#define 7seg1 P3_1
-#define 7seg2 P3_3
+#define seg1 P3_1
+#define seg2 P3_3
 
 void Timer3us(unsigned char us);
 void waitms (unsigned int ms);

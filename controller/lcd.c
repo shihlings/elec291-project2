@@ -115,42 +115,21 @@ void prepLCDl10(char* lcdbuff, unsigned int RX, unsigned int RY)
 
 void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
 {
+	seg1 = 0;
+	seg2 = 0;
 	if (ind > baseline)
 	{
-		7seg1 = 1;
-		7seg2 = 0;
-		lcdbuff[0] = 'F';
-		lcdbuff[1] = 'E';
-		lcdbuff[2] = 'R';
-		lcdbuff[3] = 'R';
-		lcdbuff[4] = 'O';
-		lcdbuff[5] = 'M';
-		lcdbuff[6] = 'A';
-		lcdbuff[7] = 'G';
-		lcdbuff[8] = 'N';
-		lcdbuff[9] = 'E';
-		lcdbuff[10] = 'T';
-		lcdbuff[11] = 'I';
-		lcdbuff[12] = 'C';
-		lcdbuff[13] = '\0';
+		seg1 = 1;
+		seg2 = 0;
 	}
-	else
+	else if (ind < baseline)
 	{
-		7seg1 = 0;
-		7seg2 = 1;
-		lcdbuff[0] = 'P';
-		lcdbuff[1] = 'A';
-		lcdbuff[2] = 'R';
-		lcdbuff[3] = 'A';
-		lcdbuff[4] = 'M';
-		lcdbuff[5] = 'A';
-		lcdbuff[6] = 'G';
-		lcdbuff[7] = 'N';
-		lcdbuff[8] = 'E';
-		lcdbuff[9] = 'T';
-		lcdbuff[10] = 'I';
-		lcdbuff[11] = 'C';
-		lcdbuff[12] = '\0';
+		seg1 = 0;
+		seg2 = 1;
+	}
+	else{
+		seg1 = 0;
+		seg2 = 0;
 	}
 }
 
