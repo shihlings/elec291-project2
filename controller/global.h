@@ -10,5 +10,5 @@
 #define RESET_IND P2_4
 #define SWITCH_LCD P2_6
 
-#define DEBUG
+//#define DEBUG
 //#define SHUTUP

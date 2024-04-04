@@ -95,7 +95,7 @@ void initALL()
 	// number from 0x0000 to 0xFFFF.
 	// WE ARE USING 0x0F28
 	UART1_Init(9600);
-	SendATCommand("AT+DVID0F28\r\n");
+	SendATCommand("AT+DVID6337\r\n");
 #ifdef DEBUG
 	SendATCommand("AT+VER\r\n");
 	SendATCommand("AT+BAUD\r\n");
@@ -131,7 +131,7 @@ void testBuzzer ()
 // if frequency > 200, play, otherwize, mute
 void compAndChangeFreq(unsigned int freq)
 {
-	if (freq > 200)
+	if (freq > 100)
 	{
 		setFreq(freq);
 		TR2 = 1;
@@ -284,6 +284,11 @@ void main (void)
 			temp = ((ind + old_ind) / 2 - baseline) * 2048 / 100;
 			compAndChangeFreq(temp);
 		}
+		else if (baseline == ind && ind != 0)
+		{
+			TR2 = 0;
+		}
+		
 		old_ind = ind;
 
 		

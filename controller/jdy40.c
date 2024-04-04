@@ -116,6 +116,7 @@ void wait_and_RI1 (unsigned int ms, char* buff)
 					buff[19] = '\0';
 				}
 				getstr1(buff);
+				received = 1;
 			}
 			Timer3us(125);
 		}
@@ -131,7 +132,7 @@ void prepstr(char* buff, unsigned int RX, unsigned int RY)
 {	
 	numToChar5(buff+0, RX);
 	numToChar5(buff+2, RY);
-	numToChar5(buff+4, RX+RY);
+	numToChar5(buff+4, 1000*((RX/1000)+(RY/1000)));
 	buff[6] = '\r';
 	buff[7] = '\n';
 	buff[8] = '\0';
@@ -162,11 +163,11 @@ void numToChar5(char* buff, unsigned int num)
 	num -= (buff[0] - '0')* 10000;
 	buff[1] = (num / 1000) + '0';
 	num -= (buff[1] - '0')*1000;
-	//buff[2] = (num / 100) + '0';
-	//num -= (buff[2]- '0')*100;
-	//buff[3] = (num / 10) + '0';
-	//num -= (buff[3]- '0')*10;
-	//buff[4] = num + '0';
+	buff[2] = (num / 100) + '0';
+	num -= (buff[2]- '0')*100;
+	buff[3] = (num / 10) + '0';
+	num -= (buff[3]- '0')*10;
+	buff[4] = num + '0';
 }
 
 void numToChar4(char* buff, unsigned int num)
