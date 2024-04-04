@@ -32,7 +32,7 @@
 #define MOTOR_DIRECTION_LEFT GPIO_B15
 #define MOTOR_CONTROL_RIGHT GPIO_B9
 #define MOTOR_DIRECTION_RIGHT GPIO_B10
-#define JOYSTICK_DEADZONE 1000
+#define JOYSTICK_DEADZONE 1500
 
 enum Direction {
   FORWARD = 0,
@@ -44,24 +44,24 @@ volatile int ISR_pwm1=150, ISR_pwm2=150, ISR_cnt=0;
 char parse_buffer (char *buff, int *num1, int *num2) {
   int num1s[5], num2s[5], num3s[5];
   int num3;
-  for (int i = 0; i<5; i++){
+  for (int i = 0; i<2; i++){
     num1s[i]=buff[i] - 48;
   }
   int j=0;
-  for (int i = 6; i < 11; i++){
+  for (int i = 2; i < 4; i++){
     num2s[j]=buff[i] - 48;
     j++;	
   }
       
   int k=0;
 
-  for (int i = 12; i<17; i++){
+  for (int i = 4; i<6; i++){
     num3s[k] = buff[i] - 48;
     k++;
   }
-  *num1 = num1s[0]*10000 + num1s[1]*1000 + num1s[2]*100 + num1s[3]*10 + num1s[4];
-  *num2 = num2s[0]*10000 + num2s[1]*1000 + num2s[2]*100 + num2s[3]*10 + num2s[4];
-  num3 = num3s[0]*10000 + num3s[1]*1000 + num3s[2]*100 + num3s[3]*10 + num3s[4];
+  *num1 = num1s[0]*10000 + num1s[1]*1000;// + num1s[2]*100 + num1s[3]*10 + num1s[4];
+  *num2 = num2s[0]*10000 + num2s[1]*1000;// + num2s[2]*100 + num2s[3]*10 + num2s[4];
+  num3 = num3s[0]*10000 + num3s[1]*1000;// + num3s[2]*100 + num3s[3]*10 + num3s[4];
   if ((*num1 + *num2) != num3) {
     return 1; // Transmission error
   }
@@ -321,8 +321,7 @@ void main(void)
 	
   waitms(500); // Give PuTTY time to start
   eputs("\x1b[2J\x1b[1;1H"); // Clear screen using ANSI escape sequence.
-  SendATCommand("AT+DVID0F28\r\n");
-  
+  SendATCommand("AT+DVID4337\r\n");
   SendATCommand("AT+VER\r\n");
   SendATCommand("AT+BAUD\r\n");
   SendATCommand("AT+RFID\r\n");
@@ -361,7 +360,9 @@ void main(void)
       
       eputs1(induc);
       eputs1("\r\n");
-      
+
+      eputs(buff);
+      eputs("\r\n");
 
       wait_and_RX(50, buff);
 
