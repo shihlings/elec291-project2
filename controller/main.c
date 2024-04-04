@@ -11,8 +11,8 @@
 #include "global.h"
 #include "buzzer.h"
 
-#define VDD 3.3035 // The measured value of VDD in volts
-idata char buff[25];
+#define VDD 3.453 // The measured value of VDD in volts
+idata char rf_buff[25];
 unsigned int ind = 0;
 unsigned int old_ind = 0;
 unsigned int baseline = 0;
@@ -60,10 +60,10 @@ void SendATCommand (char * s)
 	P2_0=0; // 'set' pin to 0 is 'AT' mode.
 	waitms(5);
 	sendstr1(s);
-	getstr1(buff);
+	getstr1(rf_buff);
 	waitms(10);
 	P2_0=1; // 'set' pin to 1 is normal operation mode.
-	printf("Response: %s\r\n", buff);
+	printf("Response: %s\r\n", rf_buff);
 }
 
 #ifdef DEBUG
@@ -88,14 +88,14 @@ void initALL()
 	// Configure joystick analog inputs
 	InitPinADC(2, 5); // Configure P2.5 as analog input
 	InitPinADC(2, 2); // Configure P2.2 as analog input
-	InitPinADC(3,0);
+	InitPinADC(1, 5); // Configure P1.5 as analog input
     InitADC();
     
     // We should select an unique device ID.  The device ID can be a hex
 	// number from 0x0000 to 0xFFFF.
 	// WE ARE USING 0x0F28
 	UART1_Init(9600);
-	SendATCommand("AT+DVID6337\r\n");
+	SendATCommand("AT+DVID4337\r\n");
 #ifdef DEBUG
 	SendATCommand("AT+VER\r\n");
 	SendATCommand("AT+BAUD\r\n");
@@ -143,17 +143,19 @@ void compAndChangeFreq(unsigned int freq)
 	}
 }
 
+idata unsigned int percent;
+idata float batvot;
+idata unsigned int new_ind = 1;
+
 void main (void)
 {
-	char buff[10];
+	//char buff[10];
 	unsigned int RX = 0;
 	unsigned int RY = 0;
-	float batvot;
 	unsigned int temp = 0;
-	unsigned int new_ind = 1;
+	
 	unsigned int checksum = 0;
-	unsigned int percent;
-	char lcdbuff[17];
+	char lcdbuff[17];	
 	
 	// Turn off Buzzer
 	TR2=0;
@@ -178,9 +180,10 @@ void main (void)
 		// read joystick data
 		RX = ADC_at_Pin(VRX);
 		RY = ADC_at_Pin(VRY);
+		
 		//Measuring voltage
 		batvot = Volts_at_Pin(BP);
-		percent = (int)(batvot/3.0*100.0);
+		percent = (unsigned int)((batvot-2.4)*100.0/0.8);
 
 		// put data on LCD
 		if (display_mode == 0)
@@ -189,17 +192,9 @@ void main (void)
 		}
 		else if (display_mode == 1)
 		{
-			prepLCDl11(lcdbuff, ind, baseline);
-			lcdbuff[0] = 'B';
-			lcdbuff[1] = 'A';
-			lcdbuff[2] = 'T';
-			lcdbuff[3] = '%';
-			lcdbuff[4] = ' ';
-			lcdbuff[5] = '=';
-			lcdbuff[6] = ' ';
-			numToChar4(lcdbuff+7, percent); 
-
+			prepLCDl11(lcdbuff, percent);
 		}
+				
 		LCDprint(lcdbuff, 1, 1);
 #ifdef DEBUG
 		printf("\r\n");
@@ -214,24 +209,24 @@ void main (void)
 #endif
 		
 		// send joystick data
-		prepstr(buff, RX, RY);
-		sendstr1(buff);
+		prepstr(rf_buff, RX, RY);
+		sendstr1(rf_buff);
 #ifdef DEBUG
 		printf("TX: ");
-		printf(buff);
+		printf(rf_buff);
 		printf("\r\n");
 #endif
 		
 		// wait and receive
-		wait_and_RI1(50, buff);
+		wait_and_RI1(50, rf_buff);
 #ifdef DEBUG
 		printf("RX: ");
-		printf(buff);
+		printf(rf_buff);
 		printf("\r\n\n");
 #endif
 
 		// parse received data
-		parseind(buff, &new_ind, &checksum);
+		parseind(rf_buff, &new_ind, &checksum);
 		
 		// validate data
 		temp = (new_ind / 1000) + (new_ind % 1000) / 100 + (new_ind % 100) / 10 + (new_ind % 10);
@@ -288,10 +283,25 @@ void main (void)
 		{
 			TR2 = 0;
 		}
+#endif		
+				
+		SEG1 = 0;
+		SEG2 = 0;
+		if (ind > baseline)
+		{
+			SEG1 = 1;
+			SEG2 = 0;
+		}
+		else if (ind < baseline)
+		{
+			SEG1 = 0;
+			SEG2 = 1;
+		}
+		else{
+			SEG1 = 0;
+			SEG2 = 0;
+		}
 		
-		old_ind = ind;
-
-		
-#endif
+		old_ind = ind;		
 	}
 }
