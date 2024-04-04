@@ -178,7 +178,10 @@ void main (void)
 		// read joystick data
 		RX = ADC_at_Pin(VRX);
 		RY = ADC_at_Pin(VRY);
-		
+		//Measuring voltage
+		batvot = Volts_at_Pin(BP);
+		percent = (int)(batvot/3.0*100.0);
+
 		// put data on LCD
 		if (display_mode == 0)
 		{
@@ -186,7 +189,16 @@ void main (void)
 		}
 		else if (display_mode == 1)
 		{
-			prepLCDl11(lcdbuff, percent, baseline);
+			prepLCDl11(lcdbuff, ind, baseline);
+			lcdbuff[0] = 'B';
+			lcdbuff[1] = 'A';
+			lcdbuff[2] = 'T';
+			lcdbuff[3] = '%';
+			lcdbuff[4] = ' ';
+			lcdbuff[5] = '=';
+			lcdbuff[6] = ' ';
+			numToChar4(lcdbuff+7, percent); 
+
 		}
 		LCDprint(lcdbuff, 1, 1);
 #ifdef DEBUG
@@ -274,10 +286,7 @@ void main (void)
 		}
 		old_ind = ind;
 
-		//Measuring voltage
-		batvot = Volts_at_Pin(BP);
-		percent = (int)(batvot/3.0*100.0);
-
+		
 #endif
 	}
 }
