@@ -140,6 +140,7 @@ void main (void)
 	char buff[10];
 	unsigned int RX = 0;
 	unsigned int RY = 0;
+	unsigned int batADC;
 	unsigned int temp = 0;
 	unsigned int new_ind = 1;
 	unsigned int checksum = 0;
@@ -164,6 +165,8 @@ void main (void)
 
 	while(1)
 	{
+		//read battery voltage
+		batADC = ADC_at_Pin(BP);
 		// read joystick data
 		RX = ADC_at_Pin(VRX);
 		RY = ADC_at_Pin(VRY);
