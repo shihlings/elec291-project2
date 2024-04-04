@@ -122,7 +122,7 @@ void prepLCDl11(char* lcdbuff, unsigned int ind, unsigned int baseline)
 	lcdbuff[4] = ' ';
 	lcdbuff[5] = '=';
 	lcdbuff[6] = ' ';
-	numToChar4(lcdbuff+7, percent); 
+	numToChar4(lcdbuff+7, ind); 
 	seg1 = 0;
 	seg2 = 0;
 	if (ind > baseline)

@@ -2,7 +2,7 @@
 #define VRY QFP32_MUX_P2_5
 
 //definition for reading battery percentage
-#define BP QFP32_MUX_P3_0
+#define BP QFP32_MUX_P2_1
 
 
 void InitADC (void);

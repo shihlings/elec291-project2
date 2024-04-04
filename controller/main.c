@@ -148,11 +148,11 @@ void main (void)
 	char buff[10];
 	unsigned int RX = 0;
 	unsigned int RY = 0;
-	unsigned int batvot;
+	float batvot;
 	unsigned int temp = 0;
 	unsigned int new_ind = 1;
 	unsigned int checksum = 0;
-	float percent;
+	unsigned int percent;
 	char lcdbuff[17];
 	
 	// Turn off Buzzer
@@ -186,7 +186,7 @@ void main (void)
 		}
 		else if (display_mode == 1)
 		{
-			prepLCDl11(lcdbuff, ind, baseline);
+			prepLCDl11(lcdbuff, percent, baseline);
 		}
 		LCDprint(lcdbuff, 1, 1);
 #ifdef DEBUG
@@ -276,7 +276,7 @@ void main (void)
 
 		//Measuring voltage
 		batvot = Volts_at_Pin(BP);
-		percent = (int) batvot/3.0*100.0;
+		percent = (int)(batvot/3.0*100.0);
 
 #endif
 	}
